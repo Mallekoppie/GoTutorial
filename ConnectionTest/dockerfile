@@ -1,0 +1,7 @@
+from alpine
+
+copy ./ConnectionTest ./ConnectionTest
+
+EXPOSE 80
+
+cmd ./ConnectionTest

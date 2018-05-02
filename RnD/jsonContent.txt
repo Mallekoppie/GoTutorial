@@ -1,0 +1,10 @@
+{
+  "accountEnabled": true,
+  "displayName": "APICreated",
+  "mailNickname": "APICreated",
+  "userPrincipalName": "apicreated@mallekoppie.onmicrosoft.com",
+  "passwordProfile" : {
+    "forceChangePasswordNextSignIn": false,
+    "password": "223322asggfWEW"
+  }
+}
