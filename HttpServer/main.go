@@ -5,6 +5,8 @@ import (
 	io "io/ioutil"
 	"log"
 	"net/http"
+
+	sigar "github.com/elastic/gosigar"
 )
 
 func readTestBody(w http.ResponseWriter, r *http.Request) {
@@ -54,6 +56,17 @@ func ReturnJsonBody(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Body write return value: ", number)
+}
+
+func GetHostCPUUsage(w http.ResponseWriter, r *http.Request) {
+
+	data, err := json.Marshal(sigar.Cpu)
+
+	if err != nil {
+		log.Println("Error retrieving CPU data", err)
+	}
+
+	w.Write(data)
 }
 
 func main() {

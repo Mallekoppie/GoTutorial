@@ -1,23 +1,34 @@
 package main
 
 import (
-	b64 "encoding/base64"
-	io "io/ioutil"
 	"log"
+
+	cpu "github.com/shirou/gopsutil/cpu"
 )
+
+func CpuTesting() {
+	/*info, err := cpu.PerfInfo()
+
+	if err != nil {
+		log.Println("Cannot get CPu stat:", err)
+	}
+
+	for i := range info {
+
+		log.Println(info[i].PercentUserTime)
+	}
+	*/
+	data, err2 := cpu.Times(true)
+
+	if err2 != nil {
+		log.Println("Couldn't get cpu stats the second time:", err2)
+	}
+
+	for i := range data {
+		log.Println(data[i])
+	}
+}
 
 func main() {
 
-	bytes, err := io.ReadFile("jsonContent.txt")
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-
-	data := string(bytes)
-
-	log.Print(data)
-
-	encodedData := b64.StdEncoding.EncodeToString(bytes)
-
-	log.Print(encodedData)
 }
