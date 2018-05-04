@@ -25,10 +25,45 @@ func CpuTesting() {
 	}
 
 	for i := range data {
-		log.Println(data[i])
+		if data[i].CPU == "_Total" {
+			log.Println(data[i])
+			log.Println(data[i].User)
+		}
+
+		//log.Println(data[i])
 	}
 }
 
-func main() {
+func PlayWithMap() {
+	headers := make(map[string]string)
 
+	headers["firstKey"] = "firstValue"
+	headers["secondKey"] = "secondValue"
+
+	log.Println(headers)
+
+	log.Println(headers["first"])
+	log.Println(headers["second"])
+
+	log.Println("looping over items")
+	for i := range headers {
+
+		log.Println(i, headers[i])
+	}
+
+	for headerKey, headerValue := range headers {
+		log.Printf("HeaderKey: %v HeaderValue: %v", headerKey, headerValue)
+	}
+}
+
+func PlayWithLogging() {
+	value := "testValue"
+
+	log.Printf("The value must be insterted here: %v : in the middle", value)
+}
+
+func main() {
+	//CpuTesting()
+	PlayWithMap()
+	//PlayWithLogging()
 }
