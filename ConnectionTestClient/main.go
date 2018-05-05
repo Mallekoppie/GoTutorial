@@ -74,6 +74,8 @@ func MuchBetterCall() {
 		log.Fatalf("Error Occured. %+v", err)
 	}
 
+	req.Header.Add("test", "testValue")
+
 	// use httpClient to send request
 	response, err := httpClient.Do(req)
 	if err != nil && response == nil {
@@ -96,7 +98,7 @@ func MuchBetterCall() {
 func TimeFunc(function function) {
 	timer := time.Now()
 
-	for i := 0; i < 10000; i++ {
+	for i := 0; i < 1; i++ {
 		function()
 	}
 	result := time.Since(timer)
@@ -112,6 +114,6 @@ func main() {
 	//TimeFunc(MakeBetterCall)
 	//TimeFunc(MakeBetterCall)
 	TimeFunc(MuchBetterCall)
-	TimeFunc(MuchBetterCall)
-	TimeFunc(MuchBetterCall)
+	//TimeFunc(MuchBetterCall)
+	//TimeFunc(MuchBetterCall)
 }
