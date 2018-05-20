@@ -1,10 +1,27 @@
 package main
 
 import (
+	//base64 "encoding/base64"
 	"log"
+	time "time"
+
+	os "os"
+	exec "os/exec"
+
+	"bufio"
 
 	cpu "github.com/shirou/gopsutil/cpu"
 )
+
+func main() {
+	//CpuTesting()
+	//PlayWithMap()
+	//PlayWithLogging()
+	//PlayWithGoRoutines()
+	//PlayWithNanoSeconds()
+	//PlayWithTheConsole()
+	//ReadUserInput()
+}
 
 func CpuTesting() {
 	/*info, err := cpu.PerfInfo()
@@ -62,8 +79,70 @@ func PlayWithLogging() {
 	log.Printf("The value must be insterted here: %v : in the middle", value)
 }
 
-func main() {
-	//CpuTesting()
-	PlayWithMap()
-	//PlayWithLogging()
+var (
+	Users      map[int]bool
+	UsersCount int = 0
+)
+
+func init() {
+	Users = make(map[int]bool)
+}
+
+func GoRoutineFunc(id int) {
+	for Users[id] == true {
+		time.Sleep(time.Second * 2)
+		log.Println("Go routine still running: ", id)
+	}
+
+	log.Println("Go routine shutting down: ", id)
+}
+
+func PlayWithGoRoutines() {
+	var mapCount int
+	for i := 0; i < 10; i++ {
+		mapCount++
+		Users[mapCount] = true
+		go GoRoutineFunc(i)
+		time.Sleep(time.Second * 1)
+
+		log.Println("MapIndex: ", mapCount)
+	}
+
+	for i := 0; i < 10; i++ {
+		mapCount--
+		Users[mapCount] = false
+		time.Sleep(time.Second * 1)
+
+		log.Println("MapIndex: ", mapCount)
+	}
+}
+
+func PlayWithNanoSeconds() {
+
+}
+
+func PlayWithTheConsole() {
+	log.Println("bla")
+	log.Println("blabla")
+
+	time.Sleep(time.Second * 5)
+	ClearOutput()
+	log.Println("Cleared")
+	time.Sleep(time.Second * 5)
+}
+
+func ClearOutput() {
+	c := exec.Command("cmd", "/c", "cls")
+	c.Stdout = os.Stdout
+	c.Run()
+}
+
+func ReadUserInput() {
+
+	scanner := bufio.NewScanner(os.Stdin)
+	log.Print("Enter command: ")
+	//result, err := reader.ReadString('\lf')
+	scanner.Scan()
+	log.Println("Received test", scanner.Text())
+
 }

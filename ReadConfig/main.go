@@ -66,9 +66,33 @@ func testWriteConfig() {
 
 }
 
+func GetConfigFromFolder() {
+	configuration := Config{}
+	err := gonfig.GetConf("./config/config.json", &configuration)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Print(configuration)
+
+	data, err := b64.StdEncoding.DecodeString(configuration.Tests[0].Body)
+
+	if err != nil {
+		log.Fatal(err.Error())
+	}
+
+	log.Print(string(data))
+
+	if len(configuration.Tests[1].Body) < 1 {
+		log.Print("nilTest body is nil")
+	}
+}
+
 func main() {
 	//testGetConfig()
 
-	testWriteConfig()
+	//testWriteConfig()
+	GetConfigFromFolder()
 
 }

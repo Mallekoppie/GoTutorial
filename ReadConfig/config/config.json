@@ -1,0 +1,15 @@
+{
+	"name":"Hendrik",
+	"nicknames":["nick","Drikkie"],
+	"tests":[
+	{
+		"name":"test1",
+		"method":"POST",
+		"body":"ew0KICAiYWNjb3VudEVuYWJsZWQiOiB0cnVlLA0KICAiZGlzcGxheU5hbWUiOiAiQVBJQ3JlYXRlZCIsDQogICJtYWlsTmlja25hbWUiOiAiQVBJQ3JlYXRlZCIsDQogICJ1c2VyUHJpbmNpcGFsTmFtZSI6ICJhcGljcmVhdGVkQG1hbGxla29wcGllLm9ubWljcm9zb2Z0LmNvbSIsDQogICJwYXNzd29yZFByb2ZpbGUiIDogew0KICAgICJmb3JjZUNoYW5nZVBhc3N3b3JkTmV4dFNpZ25JbiI6IGZhbHNlLA0KICAgICJwYXNzd29yZCI6ICIyMjMzMjJhc2dnZldFVyINCiAgfQ0KfQ=="
+	},
+	{
+		"name":"nilTest",
+		"method":"GET"		
+	}
+	]
+}

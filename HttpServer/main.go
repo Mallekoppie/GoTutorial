@@ -5,8 +5,7 @@ import (
 	io "io/ioutil"
 	"log"
 	"net/http"
-
-	sigar "github.com/elastic/gosigar"
+	//sigar "github.com/elastic/gosigar"
 )
 
 func readTestBody(w http.ResponseWriter, r *http.Request) {
@@ -60,13 +59,10 @@ func ReturnJsonBody(w http.ResponseWriter, r *http.Request) {
 
 func GetHostCPUUsage(w http.ResponseWriter, r *http.Request) {
 
-	data, err := json.Marshal(sigar.Cpu)
+}
 
-	if err != nil {
-		log.Println("Error retrieving CPU data", err)
-	}
-
-	w.Write(data)
+func AgentTest(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
 }
 
 func main() {
@@ -75,7 +71,8 @@ func main() {
 	mux.HandleFunc("/textBody", readTestBody)
 	mux.HandleFunc("/jsonBody", readJsonBody)
 	mux.HandleFunc("/returnjsonBody", ReturnJsonBody)
-	log.Println("Http Server listening on port 9000 and path /test")
+	mux.HandleFunc("/AgentTest", AgentTest)
+	log.Println("Http Server listening on port 10000 and path /test")
 
-	http.ListenAndServe(":9000", mux)
+	http.ListenAndServe(":10000", mux)
 }
