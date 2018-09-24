@@ -1,14 +1,18 @@
 package main
 
 import (
-	//base64 "encoding/base64"
+	base64 "encoding/base64"
+	"io/ioutil"
 	"log"
-	time "time"
-
 	os "os"
 	exec "os/exec"
+	"path"
+
+	time "time"
 
 	"bufio"
+
+	"strings"
 
 	cpu "github.com/shirou/gopsutil/cpu"
 )
@@ -21,6 +25,36 @@ func main() {
 	//PlayWithNanoSeconds()
 	//PlayWithTheConsole()
 	//ReadUserInput()
+	//ListFilesInFolder()
+	ConvertToBase64()
+
+}
+
+func ConvertToBase64() {
+	files, _ := ioutil.ReadDir("TestFolder")
+
+	for i := 0; i < len(files); i++ {
+		if strings.Contains(files[i].Name(), "result") == false {
+			log.Println(path.Join("TestFolder", files[i].Name()))
+			fileData, _ := ioutil.ReadFile(path.Join("TestFolder", files[i].Name()))
+			log.Println(string(fileData))
+			encodedData := base64.StdEncoding.EncodeToString(fileData)
+
+			err := ioutil.WriteFile(path.Join("TestFolder", files[i].Name()+".result"), []byte(encodedData), os.ModeExclusive)
+
+			if err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+}
+
+func ListFilesInFolder() {
+	files, _ := ioutil.ReadDir("TestFolder")
+
+	for i := 0; i < len(files); i++ {
+		log.Printf(files[i].Name())
+	}
 }
 
 func CpuTesting() {

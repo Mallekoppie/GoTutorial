@@ -1,0 +1,7 @@
+from alpine
+
+copy ./ConnectionTestHttpClient ./ConnectionTestHttpClient
+
+EXPOSE 80
+
+cmd ./ConnectionTestHttpClient

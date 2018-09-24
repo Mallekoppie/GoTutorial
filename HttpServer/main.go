@@ -47,7 +47,7 @@ func ReturnJsonBody(w http.ResponseWriter, r *http.Request) {
 		log.Println("The marshalling failed", err)
 		return
 	}
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 	number, err2 := w.Write(data)
 
 	if err2 != nil {

@@ -67,7 +67,8 @@ func createHTTPClient() *http.Client {
 }
 
 func MuchBetterCall() {
-	var endPoint string = "http://localhost:80/ConnectionTest"
+	//var endPoint string = "http://localhost:80/ConnectionTest"
+	var endPoint string = "http://localhost:85/ConnectionTest/ConnectionTest"
 
 	req, err := http.NewRequest("GET", endPoint, nil)
 	if err != nil {
@@ -98,8 +99,9 @@ func MuchBetterCall() {
 func TimeFunc(function function) {
 	timer := time.Now()
 
-	for i := 0; i < 1; i++ {
+	for i := 0; i < 1000; i++ {
 		function()
+		time.Sleep(time.Second * 1)
 	}
 	result := time.Since(timer)
 	log.Printf("End time: %v", result.Seconds())
@@ -116,4 +118,5 @@ func main() {
 	TimeFunc(MuchBetterCall)
 	//TimeFunc(MuchBetterCall)
 	//TimeFunc(MuchBetterCall)
+
 }
