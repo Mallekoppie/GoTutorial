@@ -1,0 +1,9 @@
+from alpine
+
+copy ./HTTPSServer ./HTTPSServer
+copy ./localhost.cer ./localhost.cer
+copy ./localhost.pkcs8 ./localhost.pkcs8
+
+EXPOSE 10000
+
+cmd ./HTTPSServer

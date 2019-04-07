@@ -1,0 +1,529 @@
+---
+swagger: "2.0"
+info:
+  description: "No description"
+  version: "1.0.0"
+  title: "LoadTest.V1"
+consumes:
+- "application/json"
+produces:
+- "application/json"
+paths:
+  /small:
+    get:
+      summary: "getSomeUsers"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Users"
+  /small/{userID}:
+    get:
+      summary: "getSmallUser"
+      operationId: "getSmallUser"
+      parameters:
+      - name: "userID"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "UserID"
+      responses:
+        200:
+          description: "Returns basic user information"
+          schema:
+            $ref: "#/definitions/User"
+    post:
+      summary: "create user"
+      description: "used to create a user"
+      consumes: []
+      parameters:
+      - name: "userID"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "UserID"
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+        x-exportParamName: "Body"
+      responses:
+        201:
+          description: "Status 201"
+    delete:
+      summary: "deleteUser"
+      parameters:
+      - name: "userID"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "UserID"
+      responses:
+        204:
+          description: "Status 204"
+  /mediumSized:
+    get:
+      summary: "getMediumSized"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/MediumSized"
+    post:
+      summary: "createMediumSized"
+      consumes: []
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/MediumSized"
+        x-exportParamName: "Body"
+      responses:
+        201:
+          description: "Status 201"
+  /mediumSized/{mediumId}:
+    delete:
+      summary: "deleteMediumSized"
+      parameters:
+      - name: "mediumId"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "MediumId"
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      responses:
+        202:
+          description: "Status 202"
+  /largeSized:
+    get:
+      summary: "returnLargeSized"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/largeSizeGroup"
+    post:
+      summary: "createLargeSize"
+      consumes: []
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/LargeSized"
+        x-exportParamName: "Body"
+      responses:
+        201:
+          description: "Status 201"
+  /largeSized/{largeId}:
+    get:
+      summary: "getOneLarge"
+      parameters:
+      - name: "largeId"
+        in: "path"
+        required: true
+        type: "string"
+        x-exportParamName: "LargeId"
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/LargeSized"
+  /timeout:
+    get:
+      summary: "shortTimeout"
+      description: "Must time out by returning after 60 seconds"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+  /responseCodeCheck:
+    get:
+      summary: "wrongResponseCode"
+      parameters: []
+      responses:
+        200:
+          description: "The api will not return 200 and must be rewritten to 205"
+  /headers:
+    get:
+      summary: "requestHeaders"
+      description: "Extra headers must not make it past the gateway. If they do then\
+        \ an error must be returned"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      - name: "X-Correlation-Id"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "XCorrelationId"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "Status 200"
+        500:
+          description: "Header made it past"
+    delete:
+      summary: "responseHeaders"
+      parameters:
+      - name: "Authorization"
+        in: "header"
+        required: false
+        type: "string"
+        x-exportParamName: "Authorization"
+        x-optionalDataType: "String"
+      responses:
+        200:
+          description: "Status 200"
+          headers:
+            Authorization:
+              type: "string"
+            X-Correlation-Id:
+              type: "string"
+  /slow:
+    get:
+      summary: "slowResponsesBelow30"
+      description: "between 5 and 25 seconds"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+    post:
+      summary: "slowBetween30And60"
+      parameters: []
+      responses:
+        200:
+          description: "Status 200"
+definitions:
+  User:
+    type: "object"
+    required:
+    - "name"
+    - "surname"
+    properties:
+      name:
+        type: "string"
+      surname:
+        type: "string"
+    example:
+      surname: "surname"
+      name: "name"
+  Users:
+    type: "array"
+    description: "Just a list of users"
+    items:
+      $ref: "#/definitions/User"
+  MediumSized:
+    type: "object"
+    required:
+    - "location"
+    - "name"
+    - "surname"
+    properties:
+      name:
+        type: "string"
+        minLength: 1
+        maxLength: 100
+      surname:
+        type: "string"
+        minLength: 1
+        maxLength: 100
+      address:
+        type: "string"
+      location:
+        type: "string"
+        minLength: 10
+        maxLength: 200
+      country:
+        type: "string"
+      age:
+        type: "number"
+        minimum: 0
+        maximum: 100
+      birthDate:
+        type: "string"
+        format: "date-time"
+      startDate:
+        type: "string"
+        format: "date-time"
+      Type:
+        type: "string"
+        enum:
+        - "male"
+        - "female"
+        - "other"
+    description: "An object designed to be medium sized"
+    example:
+      country: "country"
+      Type: "male"
+      address: "address"
+      surname: "surname"
+      name: "name"
+      location: "location"
+      birthDate: "2000-01-23T04:56:07.000+00:00"
+      age: 8.0082819046101150206595775671303272247314453125
+      startDate: "2000-01-23T04:56:07.000+00:00"
+  LargeSized:
+    type: "object"
+    properties:
+      one:
+        type: "number"
+        minimum: 0
+        maximum: 30
+      two:
+        type: "integer"
+        minimum: 0
+        maximum: 1000
+      three:
+        type: "boolean"
+      four:
+        $ref: "#/definitions/User"
+      five:
+        type: "string"
+        enum:
+        - "aa"
+        - "aaaa"
+        - "bbbb"
+        - "fffff"
+        - "rrrrr"
+      six:
+        $ref: "#/definitions/Users"
+      seven:
+        $ref: "#/definitions/MediumSized"
+      biggerThan100:
+        type: "string"
+        minLength: 100
+        maxLength: 4000
+      nine:
+        type: "string"
+        minLength: 2
+        maxLength: 300
+      ten:
+        type: "string"
+        minLength: 3
+        maxLength: 55
+      eleven:
+        type: "string"
+        minLength: 2
+        maxLength: 22
+      twelve:
+        type: "string"
+        minLength: 2
+        maxLength: 22
+      thirteen:
+        type: "string"
+        minLength: 2
+        maxLength: 22
+      fourteen:
+        type: "string"
+        minLength: 2
+        maxLength: 22
+      fifteen:
+        type: "string"
+        minLength: 2
+        maxLength: 22
+      sixteen:
+        type: "string"
+        minLength: 2
+        maxLength: 22
+      seventeen:
+        type: "string"
+        enum:
+        - "one"
+        - "two"
+      eighteen:
+        type: "string"
+        maxLength: 22
+      nineteen:
+        type: "string"
+        maxLength: 22
+      twenty:
+        type: "string"
+        maxLength: 22
+      twenty-one:
+        type: "string"
+        maxLength: 22
+      twenty-two:
+        type: "string"
+        maxLength: 22
+      twenty-three:
+        type: "string"
+        maxLength: 22
+      twenty-four:
+        type: "string"
+        maxLength: 22
+      twenty-five:
+        type: "string"
+        maxLength: 22
+    description: "for bigger items"
+    example:
+      nine: "nine"
+      twenty-one: "twenty-one"
+      seven:
+        country: "country"
+        Type: "male"
+        address: "address"
+        surname: "surname"
+        name: "name"
+        location: "location"
+        birthDate: "2000-01-23T04:56:07.000+00:00"
+        age: 8.0082819046101150206595775671303272247314453125
+        startDate: "2000-01-23T04:56:07.000+00:00"
+      two: 602
+      three: true
+      thirteen: "thirteen"
+      biggerThan100: "biggerThan100"
+      four:
+        surname: "surname"
+        name: "name"
+      sixteen: "sixteen"
+      ten: "ten"
+      five: "aa"
+      twenty: "twenty"
+      fifteen: "fifteen"
+      six: ""
+      twenty-three: "twenty-three"
+      nineteen: "nineteen"
+      one: 2.40248457138303450619787327013909816741943359375
+      eighteen: "eighteen"
+      fourteen: "fourteen"
+      twenty-five: "twenty-five"
+      seventeen: "one"
+      twelve: "twelve"
+      eleven: "eleven"
+      twenty-two: "twenty-two"
+      twenty-four: "twenty-four"
+  largeSizeGroup:
+    type: "object"
+    properties:
+      manyLargeSizeItems:
+        type: "array"
+        description: "for all the big things"
+        items:
+          $ref: "#/definitions/LargeSized"
+      reason:
+        type: "string"
+        description: "there won't be one"
+        minLength: 2
+        maxLength: 222
+    example:
+      reason: "reason"
+      manyLargeSizeItems:
+      - nine: "nine"
+        twenty-one: "twenty-one"
+        seven:
+          country: "country"
+          Type: "male"
+          address: "address"
+          surname: "surname"
+          name: "name"
+          location: "location"
+          birthDate: "2000-01-23T04:56:07.000+00:00"
+          age: 8.0082819046101150206595775671303272247314453125
+          startDate: "2000-01-23T04:56:07.000+00:00"
+        two: 602
+        three: true
+        thirteen: "thirteen"
+        biggerThan100: "biggerThan100"
+        four:
+          surname: "surname"
+          name: "name"
+        sixteen: "sixteen"
+        ten: "ten"
+        five: "aa"
+        twenty: "twenty"
+        fifteen: "fifteen"
+        six: ""
+        twenty-three: "twenty-three"
+        nineteen: "nineteen"
+        one: 2.40248457138303450619787327013909816741943359375
+        eighteen: "eighteen"
+        fourteen: "fourteen"
+        twenty-five: "twenty-five"
+        seventeen: "one"
+        twelve: "twelve"
+        eleven: "eleven"
+        twenty-two: "twenty-two"
+        twenty-four: "twenty-four"
+      - nine: "nine"
+        twenty-one: "twenty-one"
+        seven:
+          country: "country"
+          Type: "male"
+          address: "address"
+          surname: "surname"
+          name: "name"
+          location: "location"
+          birthDate: "2000-01-23T04:56:07.000+00:00"
+          age: 8.0082819046101150206595775671303272247314453125
+          startDate: "2000-01-23T04:56:07.000+00:00"
+        two: 602
+        three: true
+        thirteen: "thirteen"
+        biggerThan100: "biggerThan100"
+        four:
+          surname: "surname"
+          name: "name"
+        sixteen: "sixteen"
+        ten: "ten"
+        five: "aa"
+        twenty: "twenty"
+        fifteen: "fifteen"
+        six: ""
+        twenty-three: "twenty-three"
+        nineteen: "nineteen"
+        one: 2.40248457138303450619787327013909816741943359375
+        eighteen: "eighteen"
+        fourteen: "fourteen"
+        twenty-five: "twenty-five"
+        seventeen: "one"
+        twelve: "twelve"
+        eleven: "eleven"
+        twenty-two: "twenty-two"
+        twenty-four: "twenty-four"
