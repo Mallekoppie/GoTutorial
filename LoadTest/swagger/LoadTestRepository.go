@@ -10,14 +10,14 @@ func CreateUser() User {
 	return user
 }
 
-func CreateUsers() Users {
+func CreateUsers() []User {
 	user1 := CreateUser()
 	user2 := CreateUser()
 
 	users := Users{}
 	users.Users = []User{user1, user2}
 
-	return users
+	return []User{user1, user2}
 }
 
 func CreateMedium() MediumSized {
@@ -47,7 +47,7 @@ func CreateLargeSize() LargeSized {
 		Three:         true,
 		Four:          &user,
 		Five:          "some string",
-		Six:           &users,
+		Six:           users,
 		Seven:         &medium,
 		BiggerThan100: "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 		Nine:          "asdfgrqeagsdfgsdfg",

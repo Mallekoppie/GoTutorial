@@ -11,7 +11,6 @@ package swagger
 
 // for bigger items
 type LargeSized struct {
-
 	One float32 `json:"one,omitempty"`
 
 	Two int32 `json:"two,omitempty"`
@@ -22,7 +21,7 @@ type LargeSized struct {
 
 	Five string `json:"five,omitempty"`
 
-	Six *Users `json:"six,omitempty"`
+	Six []User `json:"six,omitempty"`
 
 	Seven *MediumSized `json:"seven,omitempty"`
 

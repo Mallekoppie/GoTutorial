@@ -15,6 +15,7 @@ import (
 	"log"
 	"math/rand"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -160,9 +161,11 @@ func MediumSizedGet(w http.ResponseWriter, r *http.Request) {
 func MediumSizedMediumIdDelete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	values := r.URL.Query()
+	values := r.URL.Path
 
-	result := values.Get("5")
+	split := strings.Split(values, "/")
+
+	result := split[2]
 
 	if len(result) < 1 {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -244,11 +247,11 @@ func SmallGet(w http.ResponseWriter, r *http.Request) {
 
 func SmallUserIDDelete(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	values := r.URL.Query()
+	values := r.URL.Path
+	splits := strings.Split(values, "/")
 
-	result := values.Get("5")
+	if splits[2] != "5" {
 
-	if len(result) < 1 {
 		w.WriteHeader(http.StatusInternalServerError)
 
 		return
@@ -282,7 +285,7 @@ func SmallUserIDPost(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(http.StatusCreated)
 }
 
 func TimeoutGet(w http.ResponseWriter, r *http.Request) {

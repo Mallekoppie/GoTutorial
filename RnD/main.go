@@ -15,6 +15,8 @@ import (
 	"strings"
 
 	cpu "github.com/shirou/gopsutil/cpu"
+
+	"math/rand"
 )
 
 func main() {
@@ -26,8 +28,18 @@ func main() {
 	//PlayWithTheConsole()
 	//ReadUserInput()
 	//ListFilesInFolder()
-	ConvertToBase64()
+	//ConvertToBase64()
 
+	for i := 1; i < 50; i++ {
+		RandomNumber()
+	}
+
+}
+
+func RandomNumber() {
+	sleepTime := rand.Intn(30) + 30
+
+	log.Println("Random number: ", sleepTime)
 }
 
 func ConvertToBase64() {
