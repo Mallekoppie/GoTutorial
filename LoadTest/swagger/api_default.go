@@ -210,18 +210,28 @@ func ResponseCodeCheckGet(w http.ResponseWriter, r *http.Request) {
 func SlowGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	sleepTime := rand.Intn(20) + 5
-	time.Sleep(time.Second * time.Duration(sleepTime))
+	wait := make(chan bool)
+	go func() {
+		sleepTime := rand.Intn(20) + 5
+		time.Sleep(time.Second * time.Duration(sleepTime))
+		wait <- true
+	}()
 
+	<-wait
+	close(wait)
 	w.WriteHeader(http.StatusOK)
 }
 
 func SlowPost(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 
-	sleepTime := rand.Intn(29) + 30
-	time.Sleep(time.Second * time.Duration(sleepTime))
-
+	wait := make(chan bool)
+	go func() {
+		sleepTime := rand.Intn(29) + 30
+		time.Sleep(time.Second * time.Duration(sleepTime))
+	}()
+	<-wait
+	close(wait)
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -290,8 +300,14 @@ func SmallUserIDPost(w http.ResponseWriter, r *http.Request) {
 
 func TimeoutGet(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+	wait := make(chan bool)
 
-	time.Sleep(time.Second * time.Duration(70))
+	go func() {
+		time.Sleep(time.Second * time.Duration(70))
+		wait <- true
+	}()
+	<-wait
+	close(wait)
 
 	w.WriteHeader(http.StatusOK)
 }
