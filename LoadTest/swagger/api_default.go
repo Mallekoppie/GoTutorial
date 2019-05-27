@@ -32,9 +32,8 @@ func GetSmallUser(w http.ResponseWriter, r *http.Request) {
 
 		return
 	}
-
-	w.Write(data)
 	w.WriteHeader(http.StatusOK)
+	w.Write(data)
 }
 
 func HeadersDelete(w http.ResponseWriter, r *http.Request) {
@@ -108,9 +107,8 @@ func LargeSizedLargeIdGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(data)
-
 	w.WriteHeader(http.StatusOK)
+	w.Write(data)
 }
 
 func LargeSizedPost(w http.ResponseWriter, r *http.Request) {
@@ -154,8 +152,8 @@ func MediumSizedGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write(data)
 	w.WriteHeader(http.StatusOK)
+	w.Write(data)
 }
 
 func MediumSizedMediumIdDelete(w http.ResponseWriter, r *http.Request) {
