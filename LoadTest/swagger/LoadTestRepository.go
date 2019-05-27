@@ -76,9 +76,21 @@ func CreateLargeSizeGroup() LargeSizeGroup {
 	one := CreateLargeSize()
 	Two := CreateLargeSize()
 	three := CreateLargeSize()
+	q1 := CreateLargeSize()
+	q2 := CreateLargeSize()
+	q3 := CreateLargeSize()
+	q4 := CreateLargeSize()
+	q5 := CreateLargeSize()
+	q6 := CreateLargeSize()
+	q7 := CreateLargeSize()
+	q8 := CreateLargeSize()
+	q9 := CreateLargeSize()
+	q10 := CreateLargeSize()
+	q11 := CreateLargeSize()
+	q12 := CreateLargeSize()
 
 	large := LargeSizeGroup{Reason: "there isn't actually a reason for this",
-		ManyLargeSizeItems: []LargeSized{one, Two, three}}
+		ManyLargeSizeItems: []LargeSized{one, Two, three, q1, q2, q3, q4, q5, q6, q7, q8, q9, q10, q11, q12}}
 
 	return large
 }

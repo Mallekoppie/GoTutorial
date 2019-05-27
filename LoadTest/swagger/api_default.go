@@ -225,7 +225,7 @@ func SlowPost(w http.ResponseWriter, r *http.Request) {
 
 	wait := make(chan bool)
 	go func() {
-		sleepTime := rand.Intn(29) + 30
+		sleepTime := rand.Intn(29) + 20
 		time.Sleep(time.Second * time.Duration(sleepTime))
 	}()
 	<-wait
