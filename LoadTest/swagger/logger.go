@@ -10,9 +10,7 @@
 package swagger
 
 import (
-	"log"
 	"net/http"
-	"time"
 )
 
 func Logger(inner http.Handler, name string) http.Handler {
