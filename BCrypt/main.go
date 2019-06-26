@@ -18,4 +18,12 @@ func main (){
 
 	log.Println("Hash Result: ", string(hash))
 
+	compareError := bcrypt.CompareHashAndPassword(hash, []byte(password))
+
+	if compareError != nil {
+		log.Println("Password does not match hash")
+	} else {
+		log.Println("Password matches the hash")
+	}
+
 }
