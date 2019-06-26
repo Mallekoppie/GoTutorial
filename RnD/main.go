@@ -29,11 +29,31 @@ func main() {
 	//ReadUserInput()
 	//ListFilesInFolder()
 	//ConvertToBase64()
+	//CleanFileNameDisplay()
+	CallJavaProcess()
+}
 
-	for i := 1; i < 50; i++ {
-		RandomNumber()
+func CallJavaProcess(){
+	myCmd := exec.Command("java", "-jar", "G:\\Code\\Source\\java\\java-tutorial\\gravitee-gateway-import\\target\\gravitee-contract-import-0.0.1-SNAPSHOT.jar",
+		"admin", "admin", "admin", "9001", "deploy", "none", "test")
+	myCmd.Stdout = os.Stdout
+	myCmd.Stderr = os.Stderr
+	err := myCmd.Run()
+
+	if err != nil {
+		log.Println("Error during execution: ", err.Error())
 	}
+}
 
+
+
+func CleanFileNameDisplay() {
+	filename := "connectiontest.json"
+	result := strings.Index(filename, ".json")
+
+	log.Println("Index: ", result)
+
+	log.Println("Result: ", filename[0:result])
 }
 
 func RandomNumber() {
