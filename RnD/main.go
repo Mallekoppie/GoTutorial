@@ -1,13 +1,15 @@
 package main
 
 import (
+	"crypto/cipher"
 	base64 "encoding/base64"
+	"encoding/hex"
 	"io/ioutil"
 	"log"
 	os "os"
 	exec "os/exec"
 	"path"
-
+	"io"
 	time "time"
 
 	"bufio"
@@ -16,7 +18,12 @@ import (
 
 	cpu "github.com/shirou/gopsutil/cpu"
 
-	"math/rand"
+	mathrand "math/rand"
+
+	rand "crypto/rand"
+
+	"crypto/md5"
+	"crypto/aes"
 )
 
 func main() {
@@ -30,7 +37,131 @@ func main() {
 	//ListFilesInFolder()
 	//ConvertToBase64()
 	//CleanFileNameDisplay()
-	CallJavaProcess()
+	//CallJavaProcess()
+	//CreateFolder()
+	//MoveFile()
+	//WriteTextToFile()
+	EncryptDecryptPassword()
+}
+
+func EncryptDecryptPassword() {
+	cryptoPassword := "hoopDitWerk"
+	password:= "toBeEncypted"
+
+	log.Println("Password unencrypted: ", password)
+	result := encrypt([]byte(password), cryptoPassword)
+
+	log.Println("Password encrypted binary: ", result)
+	log.Println("Password encrypted string: ", string(result))
+
+	decryptResult := decrypt(result, cryptoPassword)
+
+	log.Println("Password decrypted binary: ", decryptResult)
+	log.Println("Password decrypted string: ", string(decryptResult))
+}
+
+func decrypt(data []byte, passPhrase string) []byte {
+	key := []byte(createHash(passPhrase))
+
+	block, err := aes.NewCipher(key)
+
+	if err != nil {
+		log.Println("Unable to create cipher: ", err.Error())
+		return nil
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		log.Println("Cannot create new gcm: ", err.Error())
+		return nil
+	}
+
+	nonceSize := gcm.NonceSize()
+	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		log.Println("Unable to decrypt data: ", err.Error())
+		return nil
+	}
+
+	return plaintext
+}
+
+func encrypt(data []byte, passPhrase string)[]byte {
+	block, _ := aes.NewCipher([]byte(createHash(passPhrase)))
+
+	gcm, err := cipher.NewGCM(block)
+
+	if err != nil {
+		log.Println("Unable to create new GCM: ", err.Error())
+		return nil
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		log.Println("unable to read nonce: ", err.Error())
+	}
+
+	cipherText := gcm.Seal(nonce, nonce, data, nil)
+
+	return cipherText
+}
+
+func createHash(key string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(key))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func WriteTextToFile() {
+	// Hierdie werk net. Dit overwrite die existing file
+	sampleData := "This is a bunch opf data that will be written in string format. This must overwrite the existing file"
+
+	file, e := os.Create("G:/temp/test/created/newContract.txt")
+
+	if e != nil {
+		log.Println("Error opening destination file: ", e.Error())
+		return
+	}
+
+	n, errWrite := file.WriteString(sampleData)
+
+	if errWrite != nil {
+		log.Println("Error writing data to file: ", errWrite.Error())
+		return
+	}
+
+	log.Println("Number ofg bytes written successfully: ", n)
+
+}
+
+func MoveFile() {
+	file, err := os.Create("G:/temp/test/created/result.txt")
+
+	if err != nil {
+		log.Println("Error creating destination file: ", err.Error())
+		return
+	}
+
+	open, errOpen := os.Open("G:/temp/test/test.txt")
+
+	if errOpen != nil {
+		log.Println("Error opening source: ", errOpen.Error())
+		return
+	}
+
+	io.Copy(file, open)
+
+}
+
+func CreateFolder() {
+	// Jy kan net create call. As dit klaar exist gooi dit nie n error nie
+	err := os.MkdirAll("G:/temp/test/created", 0755)
+
+	if err != nil {
+		log.Println("Create directory failed: ", err.Error())
+	}
 }
 
 func CallJavaProcess(){
@@ -57,7 +188,7 @@ func CleanFileNameDisplay() {
 }
 
 func RandomNumber() {
-	sleepTime := rand.Intn(30) + 30
+	sleepTime := mathrand.Intn(30) + 30
 
 	log.Println("Random number: ", sleepTime)
 }
