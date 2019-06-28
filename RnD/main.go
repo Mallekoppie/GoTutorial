@@ -41,7 +41,25 @@ func main() {
 	//CreateFolder()
 	//MoveFile()
 	//WriteTextToFile()
-	EncryptDecryptPassword()
+	//EncryptDecryptPassword()
+	EncryptStoreAndRead()
+}
+
+func EncryptStoreAndRead() {
+	cryptoPassword := "hoopDitWerk"
+	password:= "toBeEncypted"
+
+	result := encrypt([]byte(password), cryptoPassword)
+
+	file, _ := os.Create("test")
+	file.Write(result)
+
+	resultRead, _ := ioutil.ReadFile("test")
+
+	bytes := decrypt(resultRead, cryptoPassword)
+
+	log.Println("Original: ", password)
+	log.Println("Read from file: ", string(bytes))
 }
 
 func EncryptDecryptPassword() {
