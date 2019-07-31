@@ -28,5 +28,6 @@ func main() {
 
 	router := sw.NewRouter()
 
-	log.Fatal(http.ListenAndServe(":11000", router))
+	log.Fatal(http.ListenAndServeTLS(":11000", "./loadtest.cer", "./loadtest.pkcs8", router))
+	//log.Fatal(http.ListenAndServe(":11000", router))
 }

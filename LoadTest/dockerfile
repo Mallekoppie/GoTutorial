@@ -1,0 +1,10 @@
+from alpine
+
+copy ./LoadTest ./LoadTest
+copy ./loadtest.cer ./loadtest.cer
+copy ./loadtest.pkcs8 ./loadtest.pkcs8
+
+
+EXPOSE 11000
+
+cmd ./LoadTest
