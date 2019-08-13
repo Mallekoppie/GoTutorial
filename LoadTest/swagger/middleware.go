@@ -15,7 +15,8 @@ import (
 	"log"
 	"net/http"
 	"strings"
-	"time"
+
+	//	"time"
 
 	"github.com/coreos/go-oidc"
 )
@@ -91,17 +92,17 @@ func Middleware(inner http.Handler, name string, roles []string) http.Handler {
 			r.Header.Add("X-Deployment-Roles", injectRoles)
 		}
 
-		start := time.Now()
+		//start := time.Now()
 		if authorized {
 			inner.ServeHTTP(w, r)
 		}
 
-		log.Printf(
+		/*log.Printf(
 			"%s %s %s %s",
 			r.Method,
 			r.RequestURI,
 			name,
 			time.Since(start),
-		)
+		)*/
 	})
 }
