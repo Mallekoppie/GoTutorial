@@ -18,10 +18,11 @@ import (
 )
 
 type Route struct {
-	Name        string
-	Method      string
-	Pattern     string
-	HandlerFunc http.HandlerFunc
+	Name          string
+	Method        string
+	Pattern       string
+	HandlerFunc   http.HandlerFunc
+	RequiredRoles []string
 }
 
 type Routes []Route
@@ -31,7 +32,7 @@ func NewRouter() *mux.Router {
 	for _, route := range routes {
 		var handler http.Handler
 		handler = route.HandlerFunc
-		handler = Logger(handler, route.Name)
+		handler = Middleware(handler, route.Name, route.RequiredRoles)
 
 		router.
 			Methods(route.Method).
@@ -53,6 +54,7 @@ var routes = Routes{
 		"GET",
 		"/",
 		Index,
+		[]string{"user", "admin"},
 	},
 
 	Route{
@@ -60,6 +62,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/small/{userID}",
 		GetSmallUser,
+		[]string{},
 	},
 
 	Route{
@@ -67,6 +70,7 @@ var routes = Routes{
 		strings.ToUpper("Delete"),
 		"/headers",
 		HeadersDelete,
+		[]string{},
 	},
 
 	Route{
@@ -74,6 +78,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/headers",
 		HeadersGet,
+		[]string{},
 	},
 
 	Route{
@@ -81,6 +86,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/largeSized",
 		LargeSizedGet,
+		[]string{},
 	},
 
 	Route{
@@ -88,6 +94,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/largeSized/{largeId}",
 		LargeSizedLargeIdGet,
+		[]string{},
 	},
 
 	Route{
@@ -95,6 +102,7 @@ var routes = Routes{
 		strings.ToUpper("Post"),
 		"/largeSized",
 		LargeSizedPost,
+		[]string{},
 	},
 
 	Route{
@@ -102,6 +110,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/mediumSized",
 		MediumSizedGet,
+		[]string{},
 	},
 
 	Route{
@@ -109,6 +118,7 @@ var routes = Routes{
 		strings.ToUpper("Delete"),
 		"/mediumSized/{mediumId}",
 		MediumSizedMediumIdDelete,
+		[]string{},
 	},
 
 	Route{
@@ -116,6 +126,7 @@ var routes = Routes{
 		strings.ToUpper("Post"),
 		"/mediumSized",
 		MediumSizedPost,
+		[]string{},
 	},
 
 	Route{
@@ -123,6 +134,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/responseCodeCheck",
 		ResponseCodeCheckGet,
+		[]string{},
 	},
 
 	Route{
@@ -130,6 +142,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/slow",
 		SlowGet,
+		[]string{},
 	},
 
 	Route{
@@ -137,6 +150,7 @@ var routes = Routes{
 		strings.ToUpper("Post"),
 		"/slow",
 		SlowPost,
+		[]string{},
 	},
 
 	Route{
@@ -144,6 +158,7 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/small",
 		SmallGet,
+		[]string{},
 	},
 
 	Route{
@@ -151,6 +166,7 @@ var routes = Routes{
 		strings.ToUpper("Delete"),
 		"/small/{userID}",
 		SmallUserIDDelete,
+		[]string{},
 	},
 
 	Route{
@@ -158,6 +174,7 @@ var routes = Routes{
 		strings.ToUpper("Post"),
 		"/small/{userID}",
 		SmallUserIDPost,
+		[]string{},
 	},
 
 	Route{
@@ -165,5 +182,6 @@ var routes = Routes{
 		strings.ToUpper("Get"),
 		"/timeout",
 		TimeoutGet,
+		[]string{},
 	},
 }
