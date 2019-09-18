@@ -1,0 +1,17 @@
+// shippy-service-consignment/proto/consignment/consignment.proto
+syntax = "proto3";
+
+package rnd;
+
+service RndServer {
+    rpc GetVersion(GetVersionRequest) returns (GetVersionResponse) {}
+}
+
+message GetVersionRequest {
+    string id = 1;
+}
+
+message GetVersionResponse {
+    string version = 1;    
+    string hostname = 2;
+}
