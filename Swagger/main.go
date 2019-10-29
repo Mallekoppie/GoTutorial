@@ -117,6 +117,9 @@ func TestProcessSwagger() {
 								return
 							}
 
+							// This is empty. Just get the last index of '/' and
+							// use the definition name to get it from definitions
+							// on the root document
 							log.Println("Schema detail ref: ", string(ref))
 						}
 
