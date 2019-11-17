@@ -11,17 +11,15 @@
     {{template "menu.html" .}}
 
     <section class="col-sm-8">
-        <form action="/App/Hello" method="GET">
+        <form action="/App/Settings" method="POST" >
           <input type="text" name="myName" /><br/>
           <input type="submit" value="Say hello!" />
       </form>
     </section>
-    <aside class="col-sm-2">
-      col 3
-    </aside>    
+
+    {{template "Help/Settings.html" .}}
+
   </div>
 </div>
-
-
 
 {{template "footer.html" .}}
