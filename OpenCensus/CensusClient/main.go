@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -16,17 +15,15 @@ import (
 	//	"contrib.go.opencensus.io/exporter/zipkin"
 	"go.opencensus.io/plugin/ochttp"
 	"go.opencensus.io/stats/view"
-	"go.opencensus.io/trace"
 )
+
+// Reference: https://opencensus.io/guides/http/go/net_http/client/
 
 func main() {
 	// Firstly, we'll register ochttp Client views
 	if err := view.Register(ochttp.DefaultClientViews...); err != nil {
 		log.Fatalf("Failed to register client views for HTTP metrics: %v", err)
 	}
-
-	// For tracing, let's always sample for the purposes of this demo
-	trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
 
 	// Enable observability to extract and examine traces and metrics.
 	enableObservabilityAndExporters()
@@ -39,11 +36,9 @@ func main() {
 	for {
 		i += 1
 		log.Printf("Performing fetch #%d", i)
-		ctx, span := trace.StartSpan(context.Background(), fmt.Sprintf("Fetch-%d", i))
-		doWork(ctx, client)
-		span.End()
+		doWork(context.Background(), client)
 
-		<-time.After(5 * time.Second)
+		<-time.After(500 * time.Millisecond)
 	}
 }
 
@@ -52,7 +47,7 @@ func doWork(ctx context.Context, client *http.Client) {
 
 	// It is imperative that req.WithContext is used to
 	// propagate context and use it in the request.
-	req = req.WithContext(ctx)
+	//req = req.WithContext(ctx)
 
 	// Now make the request to the remote end.
 	res, err := client.Do(req)
@@ -82,9 +77,4 @@ func enableObservabilityAndExporters() {
 		log.Fatal(http.ListenAndServe(":8888", mux))
 	}()
 
-	// Trace exporter: Zipkin
-	// localEndpoint, _ := openzipkin.NewEndpoint("ochttp_tutorial", "localhost:0")
-	// reporter := zipkinHTTP.NewReporter("http://localhost:9411/api/v2/spans")
-	// ze := zipkin.NewExporter(reporter, localEndpoint)
-	// trace.RegisterExporter(ze)
 }
