@@ -1,1 +1,5 @@
-package HttpMiddleware
+package main
+
+func main() {
+	Serve()
+}

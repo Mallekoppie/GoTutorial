@@ -51,11 +51,72 @@ func main() {
 	//		return // we log the errors in the function
 	//	}
 
-	err = UpdatePersonWithObject(client)
+	// err = UpdatePersonWithObject(client)
+	// if err != nil {
+	// 	return // we log the errors in the function
+	// }
+
+	// err = StoreAMap(client)
+	// if err != nil {
+	// 	return // we log the errors in the function
+	// }
+
+	err = ReadAMap(client)
 	if err != nil {
 		return // we log the errors in the function
 	}
 
+}
+
+func ReadAMap(client *mongo.Client) error {
+	collection := client.Database(MongoDBName).Collection("PlayingWithMaps")
+
+	filter := bson.D{{"name", "Test Data Name"}}
+
+	var store PlayStore
+
+	singleResult := collection.FindOne(context.TODO(), filter)
+
+	if singleResult != nil {
+		err := singleResult.Decode(&store)
+		if err != nil {
+			log.Println("Unable to decode the person that we found: ", err.Error())
+			return err
+		}
+
+		log.Println("The person that we found: ", store)
+	} else {
+		log.Println("Unable to find person")
+		return nil
+	}
+
+	return nil
+}
+
+type PlayStore struct {
+	Name string
+	Data map[string]string
+}
+
+func StoreAMap(client *mongo.Client) error {
+	collection := client.Database(MongoDBName).Collection("PlayingWithMaps")
+
+	store := PlayStore{}
+
+	store.Name = "Test Data Name"
+	store.Data = make(map[string]string, 0)
+	store.Data["key one"] = "value one"
+	store.Data["key two"] = "value two"
+
+	insertResult, err := collection.InsertOne(context.TODO(), store)
+	if err != nil {
+		log.Println("Unable to insert document:", err.Error())
+		return nil
+	}
+
+	log.Println("Person Drikkie inserted:", insertResult.InsertedID)
+
+	return nil
 }
 
 func ConnectToMongo() (client *mongo.Client, err error) {

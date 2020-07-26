@@ -98,6 +98,8 @@ func main(){
 
 		result := roles.([]interface{})
 
+		log.Println("Length: ", len(result))
+
 		log.Print("first role: ", result[0])
 
 		rolesAsString := result[0].(string)

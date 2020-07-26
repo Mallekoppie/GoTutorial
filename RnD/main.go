@@ -4,13 +4,16 @@ import (
 	"crypto/cipher"
 	base64 "encoding/base64"
 	"encoding/hex"
+	"io"
 	"io/ioutil"
 	"log"
+	"net/url"
 	os "os"
 	exec "os/exec"
 	"path"
-	"io"
 	time "time"
+
+	"gopkg.in/square/go-jose.v2/json"
 
 	"bufio"
 
@@ -22,8 +25,16 @@ import (
 
 	rand "crypto/rand"
 
-	"crypto/md5"
 	"crypto/aes"
+	"crypto/md5"
+	"net/http"
+
+	//	"github.com/dgrijalva/jwt-go"
+	"golang.org/x/crypto/ssh/terminal"
+	//	"sync"
+	"context"
+
+	"github.com/coreos/go-oidc"
 )
 
 func main() {
@@ -42,12 +53,178 @@ func main() {
 	//MoveFile()
 	//WriteTextToFile()
 	//EncryptDecryptPassword()
-	EncryptStoreAndRead()
+	//EncryptStoreAndRead()
+	//ReadJsonContractFileToString()
+	//GetOAuth2Token()
+	//ReadPassword()
+	//TagTest()
+	//PasswordSplit()
+	//PlayWithMutex()
+	//GetTokenRoles()
+	//GetTokenClaimsTake2()
+	//DeleteAllItemsInFolder()
+	CatchPanics()
+}
+
+func CatchPanics() {
+
+	go DoWork()
+
+	time.Sleep(time.Second * 2)
+
+	log.Println("Executed")
+}
+
+func HandlePanic() {
+	if err := recover(); err != nil {
+		log.Println("Stil executed. Panic: ", err)
+	}
+
+}
+
+func DoWork() {
+	defer HandlePanic()
+	panic("This must crash")
+}
+
+type TokenPayload struct {
+	Roles []string `json:"roles,omitempty"`
+	Jti   string   `json:"jti,omitempty"`
+}
+
+type Claims struct {
+	Roles []string `json:"roles,omitempty"`
+}
+
+func GetTokenClaimsTake2() {
+	token := "Bearer eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzMTZWYTBzZXZVMHdlN0hmMjU3RzlRSFVzNmQ5WFZPX0ZnSXFGT3lBZC13In0.eyJqdGkiOiI1ZjVmNzM2NC0yYmUxLTRlMmEtYTBlZC03NmJhMGMyYjJjZDkiLCJleHAiOjE1NjU3MjY2MzksIm5iZiI6MCwiaWF0IjoxNTY1NzIzMDM5LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgxODAvYXV0aC9yZWFsbXMvZ29sYW5nIiwiYXVkIjoiZ290dXRvcmlhbCIsInN1YiI6IjhkNzRmODY1LTNiMzAtNGE4Ni1hNGJkLWQ3YzcxNzdmNDNhYSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImdvdHV0b3JpYWwiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiIxYzQxMGFkMC03ZGYwLTQwNGItYWM1Yy1iMmNjZGE4ZGMyNzkiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInRlc3QiOiJzb21ldmFsdWUiLCJyb2xlcyI6WyJ1c2VyIl0sInByZWZlcnJlZF91c2VybmFtZSI6InRlc3QifQ.A80lrcXnl_LHIwV0vXDK90_1QhJXNr6Mnm3WV4xDUKpaRZrhi5i8oXo7ppHJhcbSU6DCjXEGsk4jPFAEauhYfO_lqa6_4XQXQyHz1UyN1tZeNE8Sfsgmintr0cSOUAUbK74Tp2_cntlppsCocCNmkkTCi6pL1IyijcGZLkm_SmP3dTY2F91ZzDH9P06TDc554bXvDOiT-wX0Vx_GPBLrmawiewPdovqaCUNumHDDMb3ZMyxoHYqqzwO3KYpBZWZQGdGBRtqSYvFHyNsSPU0Wg2j9Sc33HcODmSNB2U9dVuhTBZtsB0OP5biagk6krqZF4RWgnzPWkCzDSApdp482pQ"
+	ctx := context.TODO()
+	provider, err := oidc.NewProvider(ctx, "http://localhost:8180/auth/realms/golang") // this is bad
+	if err != nil {
+		panic(err)
+	}
+
+	oidcConfig := &oidc.Config{
+		ClientID: "gotutorial", // this is bad
+	}
+	verifier := provider.Verifier(oidcConfig)
+
+	parts := strings.Split(token, " ")
+
+	idToken, err := verifier.Verify(ctx, parts[1])
+
+	claims := Claims{}
+	idToken.Claims(&claims)
+
+	log.Println("Claims: ", claims)
+}
+
+func GetTokenRoles() {
+	token := "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJzMTZWYTBzZXZVMHdlN0hmMjU3RzlRSFVzNmQ5WFZPX0ZnSXFGT3lBZC13In0.eyJqdGkiOiI1ZjVmNzM2NC0yYmUxLTRlMmEtYTBlZC03NmJhMGMyYjJjZDkiLCJleHAiOjE1NjU3MjY2MzksIm5iZiI6MCwiaWF0IjoxNTY1NzIzMDM5LCJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgxODAvYXV0aC9yZWFsbXMvZ29sYW5nIiwiYXVkIjoiZ290dXRvcmlhbCIsInN1YiI6IjhkNzRmODY1LTNiMzAtNGE4Ni1hNGJkLWQ3YzcxNzdmNDNhYSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImdvdHV0b3JpYWwiLCJhdXRoX3RpbWUiOjAsInNlc3Npb25fc3RhdGUiOiIxYzQxMGFkMC03ZGYwLTQwNGItYWM1Yy1iMmNjZGE4ZGMyNzkiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbXSwicmVhbG1fYWNjZXNzIjp7InJvbGVzIjpbIm9mZmxpbmVfYWNjZXNzIiwidW1hX2F1dGhvcml6YXRpb24iXX0sInJlc291cmNlX2FjY2VzcyI6eyJhY2NvdW50Ijp7InJvbGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWFjY291bnQtbGlua3MiLCJ2aWV3LXByb2ZpbGUiXX19LCJzY29wZSI6InByb2ZpbGUgZW1haWwiLCJlbWFpbF92ZXJpZmllZCI6ZmFsc2UsInRlc3QiOiJzb21ldmFsdWUiLCJyb2xlcyI6WyJ1c2VyIl0sInByZWZlcnJlZF91c2VybmFtZSI6InRlc3QifQ.A80lrcXnl_LHIwV0vXDK90_1QhJXNr6Mnm3WV4xDUKpaRZrhi5i8oXo7ppHJhcbSU6DCjXEGsk4jPFAEauhYfO_lqa6_4XQXQyHz1UyN1tZeNE8Sfsgmintr0cSOUAUbK74Tp2_cntlppsCocCNmkkTCi6pL1IyijcGZLkm_SmP3dTY2F91ZzDH9P06TDc554bXvDOiT-wX0Vx_GPBLrmawiewPdovqaCUNumHDDMb3ZMyxoHYqqzwO3KYpBZWZQGdGBRtqSYvFHyNsSPU0Wg2j9Sc33HcODmSNB2U9dVuhTBZtsB0OP5biagk6krqZF4RWgnzPWkCzDSApdp482pQ"
+	split := strings.Split(token, ".")
+
+	payload := split[1]
+	decodedData, _ := base64.StdEncoding.DecodeString(payload)
+	log.Println("Decoded Data: ", string(decodedData))
+
+	result := TokenPayload{}
+	json.Unmarshal(decodedData, &result)
+
+	log.Println("Roles: ", result.Roles)
+	log.Println("Jti: ", result.Jti)
+
+}
+
+func PasswordSplit() {
+	password := "asdfj=asdfsdf==df"
+	result := strings.Index(password, "=")
+	value := password[result+1:]
+
+	log.Println("Password: ", value)
+}
+
+func TagTest() {
+	tags := []string{}
+
+	log.Println("Original Tags: ", tags)
+
+	javaTags := ""
+	if len(tags) > 0 {
+		for index := range tags {
+			if index == 0 {
+				javaTags = tags[index]
+			} else {
+				javaTags = javaTags + "," + tags[index]
+			}
+		}
+	} else {
+		// DEV deployment
+		javaTags = "test"
+	}
+
+	log.Println("Tags: ", javaTags)
+
+}
+
+func ReadPassword() {
+	log.Println("Enter password")
+	bytes, e := terminal.ReadPassword(int(os.Stdin.Fd()))
+	if e != nil {
+		log.Println("Unable to read password: ", e.Error())
+		return
+	}
+
+	log.Println("Password: ", string(bytes))
+}
+
+type OAuthResponse struct {
+	AccessToken string `json:"access_token"`
+}
+
+func GetOAuth2Token() {
+	params := url.Values{}
+	params.Add("client_id", "gotutorial")
+	params.Add("client_secret", "ee297078-16dc-4908-8e3e-b4718506037f")
+	params.Add("username", "test")
+	params.Add("password", "test")
+	params.Add("grant_type", "password")
+
+	resp, err := http.PostForm("http://localhost:8180/auth/realms/golang/protocol/openid-connect/token", params)
+	if err != nil {
+		log.Println("Unable to get token: ", err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	log.Println("Response: ", resp)
+	bytes, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		log.Println("Unable to read body: ", err.Error())
+		return
+	}
+
+	token := OAuthResponse{}
+
+	err = json.Unmarshal(bytes, &token)
+	if err != nil {
+		log.Println("Unmarshalling failed: ", err.Error())
+		return
+	}
+
+	log.Println("Access Token: ", token.AccessToken)
+
+}
+
+func ReadJsonContractFileToString() {
+	bytes, _ := ioutil.ReadFile("G:/logs/import-history/DEV/integration.loadtest.v3.contract.json")
+	result := string(bytes)
+
+	log.Println(result)
 }
 
 func EncryptStoreAndRead() {
 	cryptoPassword := "hoopDitWerk"
-	password:= "toBeEncypted"
+	password := "toBeEncypted"
 
 	result := encrypt([]byte(password), cryptoPassword)
 
@@ -64,7 +241,7 @@ func EncryptStoreAndRead() {
 
 func EncryptDecryptPassword() {
 	cryptoPassword := "hoopDitWerk"
-	password:= "toBeEncypted"
+	password := "toBeEncypted"
 
 	log.Println("Password unencrypted: ", password)
 	result := encrypt([]byte(password), cryptoPassword)
@@ -105,7 +282,7 @@ func decrypt(data []byte, passPhrase string) []byte {
 	return plaintext
 }
 
-func encrypt(data []byte, passPhrase string)[]byte {
+func encrypt(data []byte, passPhrase string) []byte {
 	block, _ := aes.NewCipher([]byte(createHash(passPhrase)))
 
 	gcm, err := cipher.NewGCM(block)
@@ -175,14 +352,19 @@ func MoveFile() {
 
 func CreateFolder() {
 	// Jy kan net create call. As dit klaar exist gooi dit nie n error nie
-	err := os.MkdirAll("G:/temp/test/created", 0755)
+	err := os.MkdirAll("created", 0755)
 
 	if err != nil {
 		log.Println("Create directory failed: ", err.Error())
 	}
 }
 
-func CallJavaProcess(){
+func DeleteAllItemsInFolder() {
+	os.RemoveAll("created")
+	os.MkdirAll("created", 755)
+}
+
+func CallJavaProcess() {
 	myCmd := exec.Command("java", "-jar", "G:\\Code\\Source\\java\\java-tutorial\\gravitee-gateway-import\\target\\gravitee-contract-import-0.0.1-SNAPSHOT.jar",
 		"admin", "admin", "admin", "9001", "deploy", "none", "test")
 	myCmd.Stdout = os.Stdout
@@ -193,8 +375,6 @@ func CallJavaProcess(){
 		log.Println("Error during execution: ", err.Error())
 	}
 }
-
-
 
 func CleanFileNameDisplay() {
 	filename := "connectiontest.json"
