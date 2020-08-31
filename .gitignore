@@ -21,3 +21,4 @@ EmbeddedHTTPServerCertificate/local_test.cer
 **/*.pkcs8
 **/*.ks
 **/*.cer
+Logging/logs.txt
