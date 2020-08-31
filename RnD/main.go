@@ -63,7 +63,28 @@ func main() {
 	//GetTokenRoles()
 	//GetTokenClaimsTake2()
 	//DeleteAllItemsInFolder()
-	CatchPanics()
+	// CatchPanics()
+	queryEnvironment()
+}
+
+func queryEnvironment() {
+	variables := os.Environ()
+
+	log.Println("Environment variables")
+	log.Println("===================================")
+	for index := range variables {
+		log.Println(variables[index])
+	}
+
+	log.Println("===================================")
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatalln("Unable to get hostname", err.Error())
+	}
+	log.Println("Hostname: ", hostname)
+	log.Println("===================================")
+
 }
 
 func CatchPanics() {
