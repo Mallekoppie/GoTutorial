@@ -2,12 +2,15 @@ package main
 
 import (
 	"crypto/tls"
+	"crypto/x509"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 var (
-	privateKey = `-----BEGIN PRIVATE KEY-----
+	serverPrivateKey = `-----BEGIN PRIVATE KEY-----
 MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDHP2pJKyOYBSrg
 vPTWFGcbAagaWCfpOLHYTtVgGzVdrDxAI4rM1alE9vVqa//jDxIiu8Hr5YibzlrO
 YF58Fxgyc9caEZInvP6PGfoK27Ul+WYYXdncbcp+HZdK4sG7VU2SzuVsTFU0pKFV
@@ -36,7 +39,7 @@ Kq+ywmGmPrKUUAQ80konDT9ViXlWe7qirX/VY/z13n1asRSihvH1P8dvYTkf4c8C
 rVhZKnhwTPtdv1rCIrbbMw==
 -----END PRIVATE KEY-----
 `
-	publicKey = `-----BEGIN CERTIFICATE-----
+	serverPublicKey = `-----BEGIN CERTIFICATE-----
 MIICpjCCAY6gAwIBAgIEX0ycfzANBgkqhkiG9w0BAQsFADAVMRMwEQYDVQQDDAps
 b2NhbC10ZXN0MB4XDTIwMDgzMTA2NDUxOVoXDTMwMDgzMTA2NDUxOVowFTETMBEG
 A1UEAwwKbG9jYWwtdGVzdDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEB
@@ -54,16 +57,43 @@ Zy89fI555aS63JVvXZI6Eb76IenxYViDnhOKwG4FgENNwuSQksnFhRwPrgRcEFIW
 Uidj0M9U2XNKhw==
 -----END CERTIFICATE-----
 `
+
+	clientPublicKey = `-----BEGIN CERTIFICATE-----
+MIICqDCCAZCgAwIBAgIEX0zR7zANBgkqhkiG9w0BAQsFADAWMRQwEgYDVQQDDAtj
+bGllbnQtY2VydDAeFw0yMDA4MzExMDMzMTlaFw0zMDA4MzExMDMzMTlaMBYxFDAS
+BgNVBAMMC2NsaWVudC1jZXJ0MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
+AQEAoxFsEBsZtHYhBFpCfYUmQyzPLuO9zGABTlHDYR7Lwjh/8b76foFCRmG/KXaI
+nP22QRhfsr6Xmn9tQXBqvgzQWm8Tn2v4xDKkixMdaNl63Zkc2dkBuixok9tqdiyq
+5OxK+apJ3+V+HtpPPyDIMjJby5nVZQdqkUFv5XeTm+VO1Qjaa+4QKVtFGPK6lw5N
+Cri0T9WX/JPrmQL/6oKyKSNPCwS5cNuTugWP/UNClX6h9RRrKkI/CvWmW9QNQv7H
+LfynqotuWhJUaj2CgUM9SIg1o5mIzTwZXQ1dqkR71fe2faKLJD9rV02FLVvNTNwT
+LYUiMCXq0Ja8nKstRo9AlZn/jQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQB09iOD
+j6pKKrf2OKGt/slxh2p+1zsT/y+El7VijwcQTYLHEvZ7A1ycWfbUISZ7fA6is8cy
+31h9JeaPs3ogIujn5KIFIox/rTd4CvAY0CQ8gahnSTDs/jpJj9Cxd+ihLjte9EKA
+bGXxfcZzqP/mXXsyyNgrrdCSMz9xP3hCn6A08HHiHmVGriilkHbbbdMDPhBQS/DM
+6SUPBjElrKT2eWNmUYH/27cCh6RYfv1yqFIOrYZEHTfLIzZFLallBXADSwDlLzlG
+40hBMzT91tE8wgKKAITEhlx0jmr5YFJQJgHtOSX/M4mDfqNywcOU95ff6FPGIp33
+EdbjNowRU5Sw8qvO
+-----END CERTIFICATE-----
+`
 )
 
 func main() {
-	cert, err := tls.X509KeyPair([]byte(publicKey), []byte(privateKey))
+	cert, err := tls.X509KeyPair([]byte(serverPublicKey), []byte(serverPrivateKey))
 	if err != nil {
 		log.Fatalln("Unable to load certificate key pair: ", err.Error())
 	}
 
+	pool := x509.NewCertPool()
+	result := pool.AppendCertsFromPEM([]byte(clientPublicKey))
+	if !result {
+		log.Fatalln("Unable to load client public key")
+	}
+
 	tlsConfig := &tls.Config{
 		Certificates: []tls.Certificate{cert},
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		ClientCAs:    pool,
 	}
 
 	server := http.Server{
@@ -71,8 +101,16 @@ func main() {
 		Addr:      "0.0.0.0:7777",
 	}
 
+	router := mux.NewRouter()
+	router.HandleFunc("/", handeRequest)
+	server.Handler = router
+
 	err = server.ListenAndServeTLS("", "")
 	if err != nil {
 		log.Fatalln("Error starting HTTP server: ", err.Error())
 	}
+}
+
+func handeRequest(w http.ResponseWriter, r *http.Request) {
+	log.Println("Service function reached")
 }

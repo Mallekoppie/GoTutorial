@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"crypto/cipher"
 	base64 "encoding/base64"
 	"encoding/hex"
@@ -64,7 +65,31 @@ func main() {
 	//GetTokenClaimsTake2()
 	//DeleteAllItemsInFolder()
 	// CatchPanics()
-	queryEnvironment()
+	// queryEnvironment()
+	getRunningServices()
+}
+
+func getRunningServices() {
+	command := exec.Command("sc", "query", "state=all")
+
+	buffer := bytes.NewBufferString("")
+
+	command.Stdout = buffer
+
+	err := command.Run()
+	if err != nil {
+		log.Fatalln("Error executing command: ", err.Error())
+	}
+
+	if buffer.Len() > 0 {
+		reader := bufio.NewScanner(buffer)
+
+		for reader.Scan() {
+			text := reader.Text()
+
+			log.Println(text)
+		}
+	}
 }
 
 func queryEnvironment() {
