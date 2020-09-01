@@ -5,6 +5,7 @@ import (
 	"crypto/cipher"
 	base64 "encoding/base64"
 	"encoding/hex"
+	"flag"
 	"io"
 	"io/ioutil"
 	"log"
@@ -66,7 +67,23 @@ func main() {
 	//DeleteAllItemsInFolder()
 	// CatchPanics()
 	// queryEnvironment()
-	getRunningServices()
+	// getRunningServices()
+	// subString()
+	testFlags()
+}
+
+func testFlags() {
+	port := flag.String("port", "7777", "The port the service must listen on")
+
+	flag.Parse()
+
+	log.Println("The value: ", *port)
+}
+
+func subString() {
+	test := "USERDNSDOMAIN=CAPITECBANK.FIN.SKY"
+	result := test[strings.Index(test, "=")+1:]
+	log.Println(result)
 }
 
 func getRunningServices() {
