@@ -1,9 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"crypto/cipher"
 	base64 "encoding/base64"
 	"encoding/hex"
+	"flag"
 	"io"
 	"io/ioutil"
 	"log"
@@ -63,7 +65,68 @@ func main() {
 	//GetTokenRoles()
 	//GetTokenClaimsTake2()
 	//DeleteAllItemsInFolder()
-	CatchPanics()
+	// CatchPanics()
+	// queryEnvironment()
+	// getRunningServices()
+	// subString()
+	testFlags()
+}
+
+func testFlags() {
+	port := flag.String("port", "7777", "The port the service must listen on")
+
+	flag.Parse()
+
+	log.Println("The value: ", *port)
+}
+
+func subString() {
+	test := "USERDNSDOMAIN=CAPITECBANK.FIN.SKY"
+	result := test[strings.Index(test, "=")+1:]
+	log.Println(result)
+}
+
+func getRunningServices() {
+	command := exec.Command("sc", "query", "state=all")
+
+	buffer := bytes.NewBufferString("")
+
+	command.Stdout = buffer
+
+	err := command.Run()
+	if err != nil {
+		log.Fatalln("Error executing command: ", err.Error())
+	}
+
+	if buffer.Len() > 0 {
+		reader := bufio.NewScanner(buffer)
+
+		for reader.Scan() {
+			text := reader.Text()
+
+			log.Println(text)
+		}
+	}
+}
+
+func queryEnvironment() {
+	variables := os.Environ()
+
+	log.Println("Environment variables")
+	log.Println("===================================")
+	for index := range variables {
+		log.Println(variables[index])
+	}
+
+	log.Println("===================================")
+
+	hostname, err := os.Hostname()
+	if err != nil {
+		log.Fatalln("Unable to get hostname", err.Error())
+	}
+	log.Println("Hostname: ", hostname)
+	log.Println("===================================")
+
 }
 
 func CatchPanics() {

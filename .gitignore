@@ -17,3 +17,8 @@
 BoltDBTest/test.db
 APIMConnectionTest/APIMConnectionTest
 LoadTest/LoadTest
+EmbeddedHTTPServerCertificate/local_test.cer
+**/*.pkcs8
+**/*.ks
+**/*.cer
+Logging/logs.txt
