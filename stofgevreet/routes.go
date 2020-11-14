@@ -27,4 +27,25 @@ var Routes = platform.Routes{
 		HandlerFunc: service.SaveStopwatch,
 		SlaMs:       0,
 	},
+	platform.Route{
+		Path:        "/car",
+		Method:      http.MethodGet,
+		HandlerFunc: service.SaveStopwatch,
+		SlaMs:       0,
+	},
+	platform.Route{
+		Path:        "/handicap",
+		Method:      http.MethodPost,
+		HandlerFunc: service.SaveStopwatch,
+		SlaMs:       0,
+	},
 }
+
+/*
+TODO:
+Create get to return all car data
+Push for handicap
+finish handicap table, sprocs and functions
+
+
+*/
