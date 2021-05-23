@@ -17,21 +17,21 @@ var (
 	fsm *boltFSM
 )
 
-
 func main() {
 	paramNodeId := flag.String("NodeID", "one", "You need to identify the server")
 	paramPort := flag.String("Port", "9120", "The port the raft server must listen on")
 	paramSnapshot := flag.String("SnapshotDir", "snapshot", "Where snapshot data is stored")
-	paramStore:= flag.String("StoreDir", "store", "Where snapshot data is stored")
+	paramStore := flag.String("StoreDir", "store", "Where snapshot data is stored")
 
-	paramHttpPort:= flag.String("ServerListeningPort", "9210", "Where snapshot data is stored")
+	paramHttpPort := flag.String("ServerListeningPort", "9210", "Where snapshot data is stored")
 
 	flag.Parse()
 
 	raftServer := StartRaftServer(paramNodeId, paramPort, paramSnapshot, paramStore)
 
 	httpServer := HttpServer{
-		r:  raftServer,
+		r:    raftServer,
+		port: *paramHttpPort,
 	}
 
 	go httpServer.SubscribeToLeaderChange()

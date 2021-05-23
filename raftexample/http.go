@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/Mallekoppie/goslow/platform"
@@ -12,6 +13,7 @@ import (
 
 type HttpServer struct {
 	r *raft.Raft
+	port string
 }
 
 func (s *HttpServer) SubscribeToLeaderChange(){
@@ -21,19 +23,22 @@ func (s *HttpServer) SubscribeToLeaderChange(){
 		case result := <- ch:
 			if result{
 				fmt.Println("I am now the leader")
+				payload :=PayloadCommand{
+					Command:       "LEADER",
+					LeaderAddress: "localhost:"+s.port,
+				}
+				data, err := json.Marshal(payload)
+				if err != nil {
+					fmt.Println("Unable to marshal leader payload for raft:", err.Error())
+
+				} else {
+					s.r.Apply(data, time.Second * 5)
+				}
 			}
 	}
 }
 
 func (s *HttpServer) Add(w http.ResponseWriter, r *http.Request){
-
-	if s.r.State() != raft.Leader{
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Not the leader. Should be sent to: " + s.r.Leader()))
-	}
-
-
-
 	user := UserRequest{}
 	defer r.Body.Close()
 
@@ -50,28 +55,58 @@ func (s *HttpServer) Add(w http.ResponseWriter, r *http.Request){
 		return
 	}
 
-	command := PayloadCommand{
-		Command: "SET",
-		User: user,
+	if s.r.State() != raft.Leader{
+		//w.WriteHeader(http.StatusInternalServerError)
+		//w.Write([]byte("Not the leader. Should be sent to: " + s.r.Leader()))
+
+		leaderLocation:=LeaderAddress{}
+		platform.Database.BoltDb.ReadObject("leader","leader", &leaderLocation)
+		fmt.Println("Forwarding to leader at ", leaderLocation.Address)
+
+		sendBuffer := bytes.NewBuffer(requestBodyData)
+
+		response, err := http.Post(fmt.Sprintf("http://%s/add", leaderLocation.Address), "application/json", sendBuffer)
+		if err != nil {
+			fmt.Println("Error calling leader: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+		defer response.Body.Close()
+		responseBodyData, err := io.ReadAll(response.Body)
+		if err != nil {
+			fmt.Println("Error reading response body from leader: ", err.Error())
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(response.StatusCode)
+		w.Write(responseBodyData)
+
+	} else {
+
+
+		command := PayloadCommand{
+			Command: "SET",
+			User: user,
+		}
+
+		commandData, err := json.Marshal(command)
+		if err != nil {
+			fmt.Println("Unable to marshall command")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		applyFuture := s.r.Apply(commandData, time.Second*5)
+		if applyFuture.Error() != nil {
+			fmt.Println("Error during raft apply")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Success"))
 	}
-
-	commandData, err := json.Marshal(command)
-	if err != nil {
-		fmt.Println("Unable to marshall command")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	applyFuture := s.r.Apply(commandData, time.Second*5)
-	if applyFuture.Error() != nil {
-		fmt.Println("Error during raft apply")
-		w.WriteHeader(http.StatusInternalServerError)
-		return
-	}
-
-	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Success"))
-
 }
 
 func (s *HttpServer) GetAll(w http.ResponseWriter, r *http.Request) {

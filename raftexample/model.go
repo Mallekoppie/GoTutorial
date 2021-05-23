@@ -8,9 +8,15 @@ type UserRequest struct {
 type PayloadCommand struct {
 	Command string      `json:"command"`
 	User    UserRequest `json:"name"`
+	LeaderAddress string `json:"leader_address"`
 }
 
 type RaftJoinRequest struct {
 	NodeID      string `json:"node_id"`
 	RaftAddress string `json:"raft_address"`
 }
+
+type LeaderAddress struct {
+	Address string
+}
+

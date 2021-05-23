@@ -30,6 +30,9 @@ func (b boltFSM) Apply(log *raft.Log) interface{} {
 			platform.Database.BoltDb.SaveObject("test", payload.User.Name, payload.User)
 		case "DELETE":
 			platform.Database.BoltDb.RemoveObject("test", payload.User.Name)
+		case "LEADER":
+			fmt.Println("Updating leader address to: " + payload.LeaderAddress)
+			platform.Database.BoltDb.SaveObject("leader", "leader", LeaderAddress{Address: payload.LeaderAddress})
 		}
 	case raft.LogAddPeerDeprecated:
 		fmt.Println("Apply received LogAddPeerDeprecated")
