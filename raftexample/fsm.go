@@ -24,6 +24,7 @@ func (b boltFSM) Apply(log *raft.Log) interface{} {
 			return err
 		}
 
+
 		switch payload.Command {
 		case "SET":
 			platform.Database.BoltDb.SaveObject("test", payload.User.Name, payload.User)

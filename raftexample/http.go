@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/Mallekoppie/goslow/platform"
 	"github.com/hashicorp/raft"
-	raftboltdb "github.com/hashicorp/raft-boltdb"
 	"io"
 	"net/http"
 	"time"
@@ -13,15 +12,27 @@ import (
 
 type HttpServer struct {
 	r *raft.Raft
-	db *raftboltdb.BoltStore
+}
+
+func (s *HttpServer) SubscribeToLeaderChange(){
+	ch := s.r.LeaderCh()
+
+	select {
+		case result := <- ch:
+			if result{
+				fmt.Println("I am now the leader")
+			}
+	}
 }
 
 func (s *HttpServer) Add(w http.ResponseWriter, r *http.Request){
 
 	if s.r.State() != raft.Leader{
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Not the leader"))
+		w.Write([]byte("Not the leader. Should be sent to: " + s.r.Leader()))
 	}
+
+
 
 	user := UserRequest{}
 	defer r.Body.Close()
@@ -113,4 +124,15 @@ func (s *HttpServer) Status(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	w.Write(marshal)
+}
+
+func (s *HttpServer) Snapshot(w http.ResponseWriter, r *http.Request) {
+	snapshotFuture := s.r.Snapshot()
+	if snapshotFuture.Error() != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		fmt.Println("Error creating snapshot: ", snapshotFuture.Error().Error())
+		w.Write([]byte(snapshotFuture.Error().Error()))
+		return
+	}
+
 }

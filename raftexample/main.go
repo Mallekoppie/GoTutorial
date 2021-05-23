@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/hashicorp/raft"
-	"github.com/hashicorp/raft-boltdb"
+	"github.com/hashicorp/raft-boltdb/v2"
 	"net"
 	"net/http"
 	"os"
@@ -34,11 +34,14 @@ func main() {
 		r:  raftServer,
 	}
 
+	go httpServer.SubscribeToLeaderChange()
+
 	myMux := mux.NewRouter()
 	myMux.HandleFunc("/add", httpServer.Add)
 	myMux.HandleFunc("/all", httpServer.GetAll)
 	myMux.HandleFunc("/raft/join", httpServer.JoinServer)
 	myMux.HandleFunc("/raft/status", httpServer.Status)
+	myMux.HandleFunc("/raft/snapshot", httpServer.Snapshot)
 
 	err := http.ListenAndServe(fmt.Sprintf(":%s", *paramHttpPort), myMux)
 	if err != nil {
@@ -47,7 +50,6 @@ func main() {
 }
 
 func StartRaftServer(paramNodeId, paramPort, paramSnapshot, paramStore *string) *raft.Raft {
-
 
 	fsm = &boltFSM{}
 	serverId := raft.ServerID(*paramNodeId)

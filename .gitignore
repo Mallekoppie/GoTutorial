@@ -22,3 +22,4 @@ EmbeddedHTTPServerCertificate/local_test.cer
 **/*.ks
 **/*.cer
 Logging/logs.txt
+raftexample/.idea/*
