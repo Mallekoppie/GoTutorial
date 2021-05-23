@@ -19,7 +19,117 @@ var (
 func main() {
 	// openDB()
 	// createAndReadBucket()
-	storeComplexObjects()
+	// storeComplexObjects()
+	//returnAllInBucket()
+	deleteObject()
+}
+
+func deleteObject(){
+	db, err := bolt.Open(DB_NAME, os.ModeExclusive, nil)
+	if err != nil {
+		log.Fatalln("Error opening DB: ", err.Error())
+		return
+	}
+	defer db.Close()
+
+	err = db.Update(func(tx *bolt.Tx) error {
+		b, err := tx.CreateBucketIfNotExists([]byte(BUCKET_NAME_TEST))
+		if err != nil {
+			log.Println("Error creating bucket: ", err.Error())
+			return fmt.Errorf("create bucket: %s", err)
+		}
+
+		err = b.Put([]byte("one"), []byte("answer"))
+		if err != nil {
+			log.Fatalln("Error adding data: ", err.Error())
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		log.Fatalln("Error updating DB:", err.Error())
+		return
+	}
+
+	err = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(BUCKET_NAME_TEST))
+		result := b.Get([]byte("one"))
+		if len(result) > 0 {
+			log.Println("Returned data: ", string(result))
+		} else {
+			log.Fatalln("No data returned when reading")
+		}
+
+		return nil
+	})
+
+	db.Update(func(tx *bolt.Tx) error {
+		buc := tx.Bucket([]byte(BUCKET_NAME_TEST))
+		err := buc.Delete([]byte("one"))
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+
+	err = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(BUCKET_NAME_TEST))
+		result := b.Get([]byte("one"))
+		if len(result) > 0 {
+			log.Println("Returned data: ", string(result))
+		} else {
+			log.Fatalln("No data returned when reading")
+		}
+
+		return nil
+	})
+	if err != nil {
+		log.Fatalln("Error reading DB:", err.Error())
+		return
+	}
+}
+
+func returnAllInBucket() {
+	results := getAll()
+
+	log.Println("Results")
+	for k, v := range results {
+		log.Printf("%s %s", k, string(v))
+
+	}
+}
+
+func getAll() map[string][]byte {
+	results := make(map[string][]byte, 0)
+
+	db, err := bolt.Open(DB_NAME, os.ModeExclusive, nil)
+	if err != nil {
+		log.Fatalln("Error opening DB: ", err.Error())
+		return nil
+	}
+	defer db.Close()
+
+	err = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket([]byte(BUCKET_NAME_PEOPLE))
+		cursor := b.Cursor()
+
+		for key, value := cursor.First(); key != nil; key, value = cursor.Next() {
+			log.Printf("Key: %s, Value: %s", string(key), string(value))
+
+			results[string(key)] = make([]byte, 0)
+			copy(results[string(key)], value)
+		}
+
+		return nil
+	})
+	if err != nil {
+		log.Fatalln("Error reading DB:", err.Error())
+		return nil
+	}
+
+	return results
 }
 
 type Person struct {
@@ -37,7 +147,7 @@ func storeComplexObjects() {
 	}
 	defer db.Close()
 
-	idNumber := "9283457279385"
+	idNumber := "92834572793"
 
 	err = db.Update(func(tx *bolt.Tx) error {
 		b, err := tx.CreateBucketIfNotExists([]byte(BUCKET_NAME_PEOPLE))

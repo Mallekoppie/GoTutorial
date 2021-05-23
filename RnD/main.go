@@ -69,7 +69,12 @@ func main() {
 	// queryEnvironment()
 	// getRunningServices()
 	// subString()
-	testFlags()
+	// testFlags()
+	dateToString()
+}
+
+func dateToString() {
+	log.Println(time.Now())
 }
 
 func testFlags() {
