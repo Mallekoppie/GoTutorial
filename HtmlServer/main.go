@@ -1,25 +1,36 @@
 package main
 
 import (
+	"embed"
 	"encoding/json"
+	"fmt"
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	"io/fs"
 	"log"
 	"net/http"
 	"os"
 	"time"
-
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 )
 
+//go:embed dist/*
+var dist embed.FS
+
 func main() {
+	stripped, err := fs.Sub(dist, "dist")
+	if err != nil {
+		fmt.Println("Error stripping forntend")
+	}
+	fileServer := http.FileServer(http.FS(stripped))
+
 	r := mux.NewRouter()
 	// It's important that this is before your catch-all route ("/")
 	api := r.PathPrefix("/api/").Subrouter()
 	api.HandleFunc("/users", GetUsersHandler).Methods("GET")
 	// Serve static assets directly.
-	r.PathPrefix("/static").Handler(http.FileServer(http.Dir("dist/")))
+	//r.PathPrefix("/assets").Handler(fileServer)
 	// Catch-all: Serve our JavaScript application's entry-point (index.html).
-	r.PathPrefix("/").HandlerFunc(IndexHandler("dist/index.html"))
+	r.PathPrefix("/").Handler(fileServer)
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, r),
