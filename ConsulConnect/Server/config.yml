@@ -1,0 +1,67 @@
+platform:
+  component:
+    componentname: Consul Connect Server Test
+  log:
+    # debug
+    # info
+    # warn
+    # error
+    level: info
+    filepath: "./log.txt"
+  http:
+    server:
+      listeningaddress: 0.0.0.0:9000
+      tlscertfilename: ""
+      tlskeyfilename: ""
+      tlsenabled: false
+    clients:
+    - id: default
+      tlsverify: false
+      maxidleconnections: 10
+      requesttimeout: 10
+    - id: custom
+      tlsverify: false
+      maxidleconnections: 10
+      requesttimeout: 10
+  auth:
+    server:
+      oauth:
+        enabled: false
+        idpwellknownurl: ""
+        clientid: ""
+        allowedalgorithms:
+        - rs256
+        - rs384
+      # Basic Auth adds 75 - 80 ms to the response time - queue sad face :(
+      # Passwords must be hashed using bcrypt. Unencrypted passwords will not work
+      basic:
+        enabled: false
+        allowedusers:
+          test: $2a$10$zX3HVDhKWRg2YWrf5VuHYutOOfj4DY.Wk7CsFgEFNgFmQqKBEumJG
+          user2: pass2
+  database:
+    boltdb:
+      enabled: true
+      filename: ./database.db
+  vault:
+    enabled: false
+    addresslist:
+      - 'https://localhost:8200'
+    InsecureSkipVerify: true
+    IsLocalAgent: false
+    MaxRetries: 2
+    cacert: ''
+    timeoutSeconds: 10
+    Token:
+      enabled: false
+      #      This must be empty if you want to use the token here in the config.
+      #      The token path will be used first
+      TokenPath: ''
+      token: ""
+    Cert:
+      enabled: true
+      CertFile: './client.cer'
+      KeyFile: './client.key'
+
+
+componentconfigexample:

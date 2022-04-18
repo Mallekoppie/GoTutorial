@@ -1,0 +1,14 @@
+[Unit]
+Description=Connection Test Server
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Restart=on-failure
+WorkingDirectory=/apps/connection
+ExecStart=/apps/connection/server
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target
